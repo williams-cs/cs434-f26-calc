@@ -1,0 +1,40 @@
+# calc.scup -- the calculator's grammar (and its evaluation actions).
+#
+# The starter grammar, one rule per precedence level:
+#
+#   expr     ::= term exprTail          # TODO: '-', and left assoc!
+#   exprTail ::= '+' expr | %empty
+#   term     ::= factor termTail        # TODO: '/', and left assoc!
+#   termTail ::= '*' term | %empty
+#   factor   ::= NUM | '(' expr ')'
+#
+# Beware: exprTail makes 9-2-3 parse as 9-(2-3).  A %left block with
+# a %binary rule builds a left-leaning ladder -- use one to fix this
+# once you add subtraction:
+#
+#   %left "+" "-"
+#   expr ::= %binary(term)  { ...combine $1 $2 $3... } ;
+#
+# TODO: programs: a program is %list(expr, ",") producing List[Int]; add
+# the rule, make it the %start, and see evalList in
+# src/main/scala/calc/Calc.scala.
+
+%start  expr
+%type   expr:     Int
+%type   exprTail: Int
+%type   term:     Int
+%type   termTail: Int
+%type   factor:   Int
+
+expr     ::= term exprTail  { $1 + $2 } ;
+
+exprTail ::= "+" expr  { $2 }
+           | %empty    { 0 } ;
+
+term     ::= factor termTail  { $1 * $2 } ;
+
+termTail ::= "*" term  { $2 }
+           | %empty    { 1 } ;
+
+factor   ::= NUM           { $1.text.toInt }
+           | "(" expr ")"  { $2 } ;

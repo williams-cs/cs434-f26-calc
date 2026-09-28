@@ -1,0 +1,14 @@
+# calc.slex -- the calculator's token language.
+
+%kinds calc.TokenKind
+
+%token
+  PLUS   "+"   MINUS  "-"   STAR   "*"
+  SLASH  "/"   LPAREN "("   RPAREN ")"
+  COMMA  ","
+
+[ \t\r\n]+
+
+[0-9]+      { Token(NUM, text, pos) }
+
+.           { error(s"Unexpected character '$text' at position ${pos.col}") }
